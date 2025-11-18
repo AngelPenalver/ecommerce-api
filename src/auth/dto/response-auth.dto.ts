@@ -5,5 +5,6 @@ export class ResponseDto{
     
     status: number;
 
-    data: User
+    token: string;
+    
 }
