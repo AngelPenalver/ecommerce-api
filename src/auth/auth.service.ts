@@ -1,70 +1,89 @@
 import {
-  ConflictException,
   HttpStatus,
   Injectable,
-  NotFoundException,
+  ConflictException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
-import { RegisterAuthDto } from './dto/register-auth.dto';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { ResponseDto } from './dto/response-auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+
+import { UserService } from 'src/user/user.service';
+import { ResponseDto } from './dto/response-auth.dto';
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { User } from 'src/user/entities/user.entity';
+
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   /**
    * Register a new user
     */
   async register(registerAuthDto: RegisterAuthDto): Promise<ResponseDto> {
-    const { name, password, email } = registerAuthDto;
+    try {
 
-    const user = await this.userService.findByEmail(email);
-    if (user) {
-      throw new ConflictException('User already exists');
+      const { name, password, email } = registerAuthDto;
+
+      const user = await this.userService.findByEmail(email);
+      if (user) {
+        throw new ConflictException('User already exists');
+      }
+
+      const passwordHash: string = await bcrypt.hash(password, 10);
+
+      const userDto: CreateUserDto = {
+        name,
+        password: passwordHash,
+        email,
+        role: 'USER',
+      };
+
+      const newUser = await this.userService.create(userDto);
+
+      const token = this.generateToken(newUser)
+
+      return {
+        message: 'User created successfully',
+        status: HttpStatus.CREATED,
+        token: token,
+      };
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error creating user',
+        error: error.message
+      })
     }
-
-    const passwordHash: string = await bcrypt.hash(password, 10);
-
-    const userDto: CreateUserDto = {
-      name,
-      password: passwordHash,
-      email,
-      role: 'USER',
-    };
-
-    const newUser = await this.userService.create(userDto);
-
-    const token = this.generateToken(newUser)
-
-    return {
-      message: 'User created successfully',
-      status: HttpStatus.CREATED,
-      token: token,
-    };
   }
 
   /**
    * Login a user
    */
   async login(loginAuthDto: LoginAuthDto): Promise<ResponseDto> {
-    const user = await this.validateUser(loginAuthDto);
+    try {
 
-    const token = this.generateToken(user);
+      const user = await this.validateUser(loginAuthDto);
 
-    return {
-      message: 'User logged in successfully',
-      status: HttpStatus.OK,
-      token: token,
-    };
+      const token = this.generateToken(user);
+
+      return {
+        message: 'User logged in successfully',
+        status: HttpStatus.OK,
+        token: token,
+      };
+    } catch (error) {
+
+      throw new BadRequestException({
+        message: 'Error logging in',
+        error: error.message
+      })
+    }
   }
 
   /**
