@@ -7,6 +7,9 @@ import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
@@ -17,9 +20,6 @@ import { ProductsModule } from './products/products.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     UserModule,
     AuthModule,
     ProductsModule
@@ -27,4 +27,4 @@ import { ProductsModule } from './products/products.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

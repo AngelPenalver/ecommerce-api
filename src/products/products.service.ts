@@ -12,6 +12,7 @@ export class ProductsService {
 
 
   async create(createProductDto: CreateProductDto): Promise<ResponseProductDto> {
+    
     const product = this.productRepository.create(createProductDto)
 
     const productSave = await this.productRepository.save(product)
@@ -40,7 +41,7 @@ export class ProductsService {
   }
 
   async delete(id: number): Promise<ResponseProductDto> {
-    const result = await this.productRepository.delete(id);
+    const result = await this.productRepository.softDelete(id);
 
     if (result.affected === 0) {
       throw new NotFoundException('Product not found');
