@@ -27,7 +27,6 @@ export class AuthService {
    * Register a new user
     */
   async register(registerAuthDto: RegisterAuthDto): Promise<ResponseDto> {
-    try {
 
       const { name, password, email } = registerAuthDto;
 
@@ -54,19 +53,12 @@ export class AuthService {
         status: HttpStatus.CREATED,
         token: token,
       };
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'Error creating user',
-        error: error.message
-      })
-    }
   }
 
   /**
    * Login a user
    */
   async login(loginAuthDto: LoginAuthDto): Promise<ResponseDto> {
-    try {
 
       const user = await this.validateUser(loginAuthDto);
 
@@ -77,13 +69,6 @@ export class AuthService {
         status: HttpStatus.OK,
         token: token,
       };
-    } catch (error) {
-
-      throw new BadRequestException({
-        message: 'Error logging in',
-        error: error.message
-      })
-    }
   }
 
   /**

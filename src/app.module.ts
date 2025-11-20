@@ -1,20 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-<<<<<<< HEAD
-
-@Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'angelpenalver',
-      password: 'admin',
-      database: 'db_ecommerce',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
-=======
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
@@ -38,13 +23,8 @@ import { ProductsModule } from './products/products.module';
     UserModule,
     AuthModule,
     ProductsModule
->>>>>>> development
   ],
   controllers: [],
   providers: [],
 })
-<<<<<<< HEAD
-export class AppModule {}
-=======
 export class AppModule { }
->>>>>>> development
