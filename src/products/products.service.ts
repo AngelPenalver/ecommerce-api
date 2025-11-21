@@ -11,20 +11,16 @@ export class ProductsService {
   constructor(@InjectRepository(Product) private productRepository: Repository<Product>) { }
 
 
-  async create(createProductDto: CreateProductDto): Promise<ResponseProductDto> {
-    
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+
     const product = this.productRepository.create(createProductDto)
 
     const productSave = await this.productRepository.save(product)
 
-    return {
-      message: 'Product created successfully',
-      status: HttpStatus.CREATED,
-      data: productSave
-    }
+    return productSave
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<ResponseProductDto> {
+  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
     const result = await this.productRepository.update(id, updateProductDto);
 
     if (result.affected === 0) {
@@ -33,29 +29,22 @@ export class ProductsService {
 
     const productFound = await this.findOne(id);
 
-    return {
-      message: 'Product updated successfully',
-      status: HttpStatus.OK,
-      data: productFound,
-    };
+    return productFound
   }
 
-  async delete(id: number): Promise<ResponseProductDto> {
+  async delete(id: number): Promise<boolean> {
     const result = await this.productRepository.softDelete(id);
 
     if (result.affected === 0) {
       throw new NotFoundException('Product not found');
     }
 
-    return {
-      message: 'Product deleted successfully',
-      status: HttpStatus.OK,
-    };
+    return true
   }
 
   async findAll(): Promise<Product[]> {
-
     return await this.productRepository.find()
+
   }
 
   async findOne(id: number): Promise<Product> {

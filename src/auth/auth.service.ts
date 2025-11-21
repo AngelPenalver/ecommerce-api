@@ -26,7 +26,7 @@ export class AuthService {
   /**
    * Register a new user
     */
-  async register(registerAuthDto: RegisterAuthDto): Promise<ResponseDto> {
+  async register(registerAuthDto: RegisterAuthDto): Promise<{accessToken: string}> {
 
       const { name, password, email } = registerAuthDto;
 
@@ -48,27 +48,19 @@ export class AuthService {
 
       const token = this.generateToken(newUser)
 
-      return {
-        message: 'User created successfully',
-        status: HttpStatus.CREATED,
-        token: token,
-      };
+      return {accessToken: token}
   }
 
   /**
    * Login a user
    */
-  async login(loginAuthDto: LoginAuthDto): Promise<ResponseDto> {
+  async login(loginAuthDto: LoginAuthDto): Promise<{accessToken: string}>{
 
       const user = await this.validateUser(loginAuthDto);
 
       const token = this.generateToken(user);
 
-      return {
-        message: 'User logged in successfully',
-        status: HttpStatus.OK,
-        token: token,
-      };
+      return {accessToken: token};
   }
 
   /**
