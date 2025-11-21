@@ -1,36 +1,58 @@
-import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { ResponseProductDto } from './dto/response-product.dto';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectRepository(Product) private productRepository: Repository<Product>) { }
+  constructor(@InjectRepository(Product) private productRepository: Repository<Product>, private readonly categoriesService: CategoriesService) { }
 
+  /**
+   * Create product with validated categories
+   */
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
 
-    const product = this.productRepository.create(createProductDto)
+    const categoriesFormated = await this.categoriesService.validateCategoriesExist(createProductDto.categories)
+
+    const product = this.productRepository.create({
+      ...createProductDto,
+      categories: categoriesFormated
+    })
 
     const productSave = await this.productRepository.save(product)
 
     return productSave
   }
 
+  /**
+   * Update product with validated categories
+   */
   async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
-    const result = await this.productRepository.update(id, updateProductDto);
 
-    if (result.affected === 0) {
-      throw new NotFoundException('Product not found');
+    const categoriesFormated = updateProductDto.categories ? await this.categoriesService.validateCategoriesExist(updateProductDto.categories) : undefined;
+
+    const product = await this.productRepository.preload({
+      id,
+      ...updateProductDto,
+      categories: categoriesFormated
+    })
+    
+    if(!product){
+      throw new NotFoundException('Product not found')
     }
 
-    const productFound = await this.findOne(id);
 
-    return productFound
+    return await this.productRepository.save(product)
   }
+
+
+  /**
+   *  Delete product
+   */
 
   async delete(id: number): Promise<boolean> {
     const result = await this.productRepository.softDelete(id);
@@ -42,11 +64,18 @@ export class ProductsService {
     return true
   }
 
+  /**
+   * Find all products
+   */
+
   async findAll(): Promise<Product[]> {
     return await this.productRepository.find()
 
   }
 
+  /**
+   *  Find one products
+   */
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOneBy({ id })
 

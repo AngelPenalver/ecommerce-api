@@ -4,6 +4,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { ProductsModule } from './products/products.module';
     }),
     UserModule,
     AuthModule,
-    ProductsModule
+    ProductsModule,
+    CategoriesModule
   ],
   controllers: [],
   providers: [],

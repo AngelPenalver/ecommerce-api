@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Category } from "src/categories/entities/category.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('products')
 export class Product {
@@ -8,10 +9,10 @@ export class Product {
     @Column({ type: 'varchar', length: 100, nullable: false })
     name: string;
 
-    @Column({ type: 'text',  nullable: false })
+    @Column({ type: 'text', nullable: false })
     description: string;
 
-    @Column({ type: 'decimal', nullable: false })
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
     price: number;
 
     @Column({ type: 'int', nullable: false })
@@ -19,6 +20,10 @@ export class Product {
 
     @Column({ type: 'boolean', default: true })
     isActived: boolean;
+
+    @ManyToMany(() => Category, { cascade: true })
+    @JoinTable({ name: 'product_category' })
+    categories: Category[]
 
     @CreateDateColumn()
     createdAt: Date;
