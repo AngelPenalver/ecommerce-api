@@ -5,6 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProjectModule } from './project/project.module';
+import { DeveloperModule } from './developer/developer.module';
+import { CommonModule } from './common/common.module';
+import { AuthDeveloperModule } from './auth-developer/auth-developer.module';
 
 @Module({
   imports: [
@@ -25,7 +29,11 @@ import { CategoriesModule } from './categories/categories.module';
     UserModule,
     AuthModule,
     ProductsModule,
-    CategoriesModule
+    CategoriesModule,
+    ProjectModule,
+    DeveloperModule,
+    CommonModule,
+    AuthDeveloperModule
   ],
   controllers: [],
   providers: [],
