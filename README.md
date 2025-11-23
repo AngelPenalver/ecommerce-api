@@ -1,6 +1,6 @@
 # ecommerce-api
 
-REST API for an e‑commerce platform built with **NestJS**, **TypeORM**, and **PostgreSQL**. It includes JWT authentication, user management, products and categories, validations with `class-validator`, and a standard response wrapper for all endpoints.
+REST API for an e‑commerce platform built with **NestJS**, **TypeORM**, and **PostgreSQL**. It includes JWT authentication for both Users and Developers, product and category management, and project tracking.
 
 ## Tech stack
 
@@ -13,35 +13,43 @@ REST API for an e‑commerce platform built with **NestJS**, **TypeORM**, and **
 
 ```text
 src/
-  app.module.ts          # Root module, registers TypeORM, Config, and domain modules
-  main.ts                # Nest bootstrap, global prefix /api/v1 and ValidationPipe
+  app.module.ts          # Root module
+  main.ts                # Nest bootstrap, global prefix /api/v1
 
-  auth/
-    auth.controller.ts   # Register and login endpoints
-    auth.service.ts      # Authentication logic and JWT generation
-    constants/           # JWT constants and config
-    dto/                 # Login and register DTOs
+  auth-users/            # Authentication for end-users
+    auth-users.controller.ts
+    auth-users.service.ts
+    dto/
 
-  user/
-    user.module.ts       # User module, exports UserService
-    user.controller.ts   # Controller (no public endpoints yet)
-    user.service.ts      # User creation and lookup by email
-    dto/create-user.dto.ts
+  auth-developer/        # Authentication for developers
+    auth-developer.controller.ts
+    auth-developer.service.ts
+    dto/
+
+  user/                  # User management
+    user.module.ts
+    user.service.ts
     entities/user.entity.ts
 
-  products/
-    products.module.ts   # Products module, imports CategoriesModule
+  developer/             # Developer management
+    developer.module.ts
+    developer.service.ts
+    entities/developer.entity.ts
+
+  products/              # Product catalog
     products.controller.ts
     products.service.ts
-    dto/                 # Product create/update DTOs
     entities/product.entity.ts
 
-  categories/
-    categories.module.ts
+  categories/            # Product categories
     categories.controller.ts
     categories.service.ts
-    dto/                 # Category create/update DTOs
     entities/category.entity.ts
+
+  project/               # Project management
+    project.controller.ts
+    project.service.ts
+    entities/project.entity.ts
 
   common/
     dto/api-response.dto.ts # Standard API response wrapper
@@ -68,13 +76,11 @@ pnpm install   # or npm install / yarn install
 Based on `.env.example`:
 
 ```env
-JWT_SECRET='Here you can put your secret key'
+JWT_SECRET_USER='Here you can put your secret key'
+JWT_SECRET_DEVELOPER='Here you can put your secret key'
 PORT='Here you can put your port'
-DATABASE_HOST='Here you can put your database host'
-DATABASE_PORT='Here you can put your database port'
-DATABASE_USERNAME='Here you can put your database username'
-DATABASE_PASSWORD='Here you can put your database password'
-DATABASE_NAME='Here you can put your database name'
+DATABASE_URL='Here you can put your database url'
+STAGE='Here you can put your stage'
 ```
 
 Create a `.env` file in the project root with values adapted to your environment.
@@ -96,73 +102,86 @@ By default the API runs at `http://localhost:${PORT || 3000}/api/v1`.
 ## Core entities
 
 ### User
-
 - `id: number`
 - `name: string`
 - `email: string`
-- `password: string` (hashed with bcrypt)
-- `role: string` (e.g. `USER`)
+- `password: string` (hashed)
+- `role: string`
+
+### Developer
+- `id: number`
+- `name: string`
+- `email: string`
+- `password: string` (hashed)
+- `role: string`
 
 ### Product
-
 - `id: number`
 - `name: string`
 - `description: string`
 - `price: number`
 - `stock: number`
 - `isActived: boolean`
-- `categories: Category[]` (ManyToMany relation via `product_category` table)
-- `createdAt`, `updatedAt`, `deletedAt`
+- `categories: Category[]`
 
 ### Category
-
 - `id: number`
-- `name: string` (unique)
-- `createdAt`, `updatedAt`, `deletedAt`
+- `name: string`
+
+### Project
+- `id: number`
+- `name: string`
+- `description: string`
 
 ## Main DTOs
 
-### Auth
+### Auth Users
+- `RegisterAuthDto`: `name`, `email`, `password`
+- `LoginAuthDto`: `email`, `password`
 
-- `RegisterAuthDto`:
-  - `name: string`
-  - `email: string`
-  - `password: string`
-
-- `CreateUserDto` (used internally by AuthService when registering):
-  - `name: string`
-  - `email: string`
-  - `password: string`
-  - `role: Role` (`ADMIN` | `USER`)
-
-- `Role` enum:
-  - `ADMIN`
-  - `USER`
-
-- `LoginAuthDto`:
-  - `email: string`
-  - `password: string`
+### Auth Developer
+- `RegisterAuthDeveloperDto`: `name`, `email`, `password`
+- `LoginAuthDeveloperDto`: `email`, `password`
 
 ### Products
-
-- `CreateProductDto`:
-  - `name: string`
-  - `description: string`
-  - `price: number`
-  - `stock: number`
-  - `categories: number[]` (ids of existing categories)
-  - `isActived?: boolean`
-
-- `UpdateProductDto`:
-  - Optional product fields (including `categories?: number[]`)
+- `CreateProductDto`: `name`, `description`, `price`, `stock`, `categories` (ids), `isActived`
+- `UpdateProductDto`: Partial fields
 
 ### Categories
+- `CreateCategoryDto`: `name`
+- `UpdateCategoryDto`: `name`
 
-- `CreateCategoryDto`:
-  - `name: string`
+## Endpoints
 
-- `UpdateCategoryDto`:
-  - `name?: string`
+**Base URL:** `http://localhost:{PORT}/api/v1`
+
+### Auth Users (`/auth-users`)
+- **POST /register**: Register a new user.
+- **POST /login**: Login as user.
+
+### Auth Developer (`/auth-developer`)
+- **POST /register**: Register a new developer.
+- **POST /login**: Login as developer.
+
+### Products (`/products`)
+- **POST /**: Create product.
+- **GET /**: Get all products.
+- **GET /:id**: Get product by ID.
+- **PUT /:id**: Update product.
+- **DELETE /:id**: Soft delete product.
+
+### Categories (`/categories`)
+- **POST /**: Create category.
+- **GET /**: Get all categories.
+- **GET /:id**: Get category by ID.
+- **PUT /:id**: Update category.
+- **DELETE /:id**: Soft delete category.
+
+### Developer (`/developer`)
+- _Endpoints to be implemented_
+
+### Project (`/project`)
+- _Endpoints to be implemented_
 
 ## Response format
 
@@ -175,143 +194,3 @@ export class ApiResponseDto<T> {
   data?: T;
 }
 ```
-
-## Endpoints
-
-**Base URL:** `http://localhost:{PORT}/api/v1`
-
-### Auth
-
-**POST /auth/register**
-
-- **Body**:
-  - `name: string`
-  - `email: string`
-  - `password: string`
-- **Response** (`ApiResponseDto<{ token: string }>`):
-  - `message`: `User created successfully`
-  - `status`: `201`
-  - `data.token`: access JWT
-
-**POST /auth/login**
-
-- **Body**:
-  - `email: string`
-  - `password: string`
-- **Response** (`ApiResponseDto<{ token: string }>`):
-  - `message`: `User logged in successfully`
-  - `status`: `200`
-  - `data.token`: access JWT
-
-> Note: at the moment there are no guards applied on the controllers, so the endpoints are exposed without extra protection. This can be extended later by adding JWT guards.
-
-### Products
-
-**POST /products**
-
-- **Body** (`CreateProductDto`):
-  - `name: string`
-  - `description: string`
-  - `price: number`
-  - `stock: number`
-  - `categories: number[]` (ids of existing categories)
-  - `isActived?: boolean`
-- **Behavior**:
-  - Validates that all category ids exist with `CategoriesService.validateCategoriesExist`.
-  - Creates the product and associates the categories.
-- **Response** (`ApiResponseDto<Product>`)
-
-**GET /products**
-
-- **Response** (`ApiResponseDto<Product[]>`):
-  - List of products with `categories` eagerly loaded (`relations: ['categories']`).
-
-**GET /products/:id**
-
-- **Params**:
-  - `id: number`
-- **Response** (`ApiResponseDto<Product>`):
-  - Product with its `categories` loaded.
-  - `404` if it does not exist (`NotFoundException`).
-
-**PUT /products/:id**
-
-- **Params**:
-  - `id: number`
-- **Body** (`UpdateProductDto`):
-  - Fields to update; if `categories` is provided, ids are validated and re‑assigned.
-- **Behavior**:
-  - Uses TypeORM `preload` to load the product and apply changes.
-  - Throws `NotFoundException` if the product does not exist.
-- **Response** (`ApiResponseDto<Product>`)
-
-**DELETE /products/:id**
-
-- **Params**:
-  - `id: number`
-- **Behavior**:
-  - `softDelete` of the product.
-  - Throws `NotFoundException` if it does not exist.
-- **Response** (`ApiResponseDto<void>`)
-
-### Categories
-
-**POST /categories**
-
-- **Body** (`CreateCategoryDto`):
-  - `name: string`
-- **Response** (`ApiResponseDto<Category>`):
-  - `message`: `Category created successfully`
-
-**GET /categories**
-
-- **Response** (`ApiResponseDto<Category[]>`):
-  - List of categories (service is ready to include related products when the entity defines them).
-
-**GET /categories/:id**
-
-- **Params**:
-  - `id: number`
-- **Response** (`ApiResponseDto<Category>`):
-  - Category found or `404` if it does not exist.
-
-**PUT /categories/:id**
-
-- **Params**:
-  - `id: number`
-- **Body** (`UpdateCategoryDto`):
-  - Fields to update (e.g. `name`).
-- **Response** (`ApiResponseDto<Category>`)
-
-**DELETE /categories/:id**
-
-- **Params**:
-  - `id: number`
-- **Behavior**:
-  - `softDelete` of the category.
-- **Response** (`ApiResponseDto<void>`):
-  - `message`: `Category deleted successfully`
-
-### User
-
-Currently `UserController` does not expose additional endpoints besides the auth flows. User creation is handled via `AuthService.register`, which delegates to `UserService`.
-
-## Validation and error handling
-
-- Global `ValidationPipe` with:
-  - `whitelist: true` (only allows properties defined in the DTO)
-  - `forbidNonWhitelisted: true` (throws if extra properties are sent)
-  - `transform: true` (transforms payload types based on DTO metadata)
-- Standard NestJS exceptions:
-  - `NotFoundException` for missing resources
-  - `ConflictException` for duplicate users
-  - `UnauthorizedException` for invalid credentials
-  - `BadRequestException` for validation errors
-
-## Next steps / possible improvements
-
-- Protect endpoints with JWT guards (roles, auth, etc.).
-- Add explicit CRUD endpoints for users.
-- Document the API with Swagger (`@nestjs/swagger`).
-- Add more unit and e2e tests.
-

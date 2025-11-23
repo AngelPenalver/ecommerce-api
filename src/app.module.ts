@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthUsersModule } from './auth-users/auth-users.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
@@ -17,23 +17,23 @@ import { AuthDeveloperModule } from './auth-developer/auth-developer.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: process.env.DATABASE_URL, 
+      url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true, 
-      
+      synchronize: true,
+
       ssl: process.env.STAGE === 'prod' ? {
         rejectUnauthorized: false
-      } : false, 
-      
+      } : false,
+
     }),
     UserModule,
-    AuthModule,
+    AuthUsersModule,
+    AuthDeveloperModule,
     ProductsModule,
     CategoriesModule,
     ProjectModule,
     DeveloperModule,
-    CommonModule,
-    AuthDeveloperModule
+    CommonModule
   ],
   controllers: [],
   providers: [],
