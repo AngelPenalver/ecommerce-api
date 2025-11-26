@@ -4,7 +4,7 @@ import { ApiResponseDto } from 'src/common/dto/api-response.dto';
 import { RegisterAuthDeveloperDto } from './dto/register-auth-developer.dto';
 import { LoginAuthDeveloperDto } from './dto/login-auth-developer.dto';
 
-@Controller('auth-developer')
+@Controller('sys/auth')
 export class AuthDeveloperController {
   constructor(private readonly authDeveloperService: AuthDeveloperService) { }
 

@@ -35,7 +35,7 @@ export class AuthDeveloperService {
   generateToken(developer: Developer) {
     const payload = {
       email: developer.email,
-      id: developer.id,
+      developer_id: developer.id,
     }
     return {
       accessToken: this.jwtServices.sign(payload)

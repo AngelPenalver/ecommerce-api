@@ -3,12 +3,12 @@ import { AuthDeveloperService } from './auth-developer.service';
 import { AuthDeveloperController } from './auth-developer.controller';
 import { DeveloperModule } from 'src/developer/developer.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/auth-users/constants/jwt.constant';
+import { jwtConstants } from 'src/utils/constants/jwt.constant';
 
 @Module({
   imports: [DeveloperModule, JwtModule.register({
     global: true,
-    secret: jwtConstants.secret,
+    secret: jwtConstants.secret_developer,
     signOptions: { expiresIn: '1h' },
   })],
   controllers: [AuthDeveloperController],

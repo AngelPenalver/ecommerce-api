@@ -4,7 +4,7 @@ import { DeveloperController } from './developer.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Developer } from './entities/developer.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/auth-users/constants/jwt.constant';
+import { jwtConstants } from 'src/utils/constants/jwt.constant';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Developer])],
