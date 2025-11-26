@@ -1,6 +1,6 @@
 # ecommerce-api
 
-REST API for an e‑commerce platform built with **NestJS**, **TypeORM**, and **PostgreSQL**. It includes JWT authentication for both Users and Developers, product and category management, and project tracking.
+REST API for an e-commerce platform built with **NestJS**, **TypeORM**, and **PostgreSQL**. It includes JWT authentication for both Users and Developers, product and category management, and project tracking.
 
 ## Tech stack
 
@@ -52,7 +52,11 @@ src/
     entities/project.entity.ts
 
   common/
+    decorators/             # Custom decorators
+    interfaces/             # Custom interfaces
     dto/api-response.dto.ts # Standard API response wrapper
+
+  utils/                    # Utility functions and constants
 ```
 
 ## Setup and installation
@@ -97,7 +101,7 @@ pnpm test        # jest
 pnpm lint        # eslint
 ```
 
-By default the API runs at `http://localhost:${PORT || 3000}/api/v1`.
+By default the API runs at `http://localhost:3000/api/v1` (or your configured PORT).
 
 ## Core entities
 
@@ -159,7 +163,7 @@ By default the API runs at `http://localhost:${PORT || 3000}/api/v1`.
 - **POST /register**: Register a new user.
 - **POST /login**: Login as user.
 
-### Auth Developer (`/auth-developer`)
+### Auth Developer (`/sys/auth`)
 - **POST /register**: Register a new developer.
 - **POST /login**: Login as developer.
 
@@ -180,8 +184,8 @@ By default the API runs at `http://localhost:${PORT || 3000}/api/v1`.
 ### Developer (`/developer`)
 - _Endpoints to be implemented_
 
-### Project (`/project`)
-- _Endpoints to be implemented_
+### Project (`/sys/project`)
+- **POST /**: Create project.
 
 ## Response format
 
